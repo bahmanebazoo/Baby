@@ -1,5 +1,7 @@
 package com.example.bazoo.musicplayerhw9.model;
 
+import android.net.Uri;
+
 public class Song {
 
     public final long albumId;
@@ -7,6 +9,7 @@ public class Song {
     public final long artistId;
     public final String artistName;
     public final int duration;
+    public final Uri uri;
 
 
     public String getAlbumName() {
@@ -42,9 +45,10 @@ public class Song {
         this.albumName = "";
         this.duration = -1;
         this.trackNumber = -1;
+        this.uri = null;
     }
 
-    public Song(long _id, long _albumId, long _artistId, String _title, String _artistName, String _albumName, int _duration, int _trackNumber) {
+    public Song(long _id, long _albumId, long _artistId, String _title, String _artistName, String _albumName, int _duration, int _trackNumber,Uri uri) {
         this.id = _id;
         this.albumId = _albumId;
         this.artistId = _artistId;
@@ -53,6 +57,7 @@ public class Song {
         this.albumName = _albumName;
         this.duration = _duration;
         this.trackNumber = _trackNumber;
+        this.uri = uri;
     }
 
 }
