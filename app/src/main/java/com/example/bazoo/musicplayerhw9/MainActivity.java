@@ -77,7 +77,11 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                songsFragment.playOrPause();
+                boolean play = songsFragment.playOrPause();
+                if(play)
+                    playBtn.setText(R.string.play);
+                else
+                    playBtn.setText(R.string.pause);
             }
 
 

@@ -7,12 +7,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.bazoo.musicplayerhw9.model.Song;
 
-import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -27,8 +26,11 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class SongsFragment extends androidx.fragment.app.Fragment {
 
+    private final int hourPerMS = 3600000;
+    private final int minPerMS = 60000;
+    private final int secPerMS = 1000;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("mm:ss");
     private MediaPlayer mediaPlayer = new MediaPlayer();
-    private LinearLayout linearLayout;
     private List<Song> songs = new ArrayList<>();
     private SongViewHolder songViewHolder;
     private RecyclerView recyclerView;
@@ -61,16 +63,18 @@ public class SongsFragment extends androidx.fragment.app.Fragment {
         recyclerView.setAdapter(songAdapter);
 
 
-
         return songView;
     }
 
 
-    public void playOrPause() {
-        if (mediaPlayer.isPlaying())
+    public boolean playOrPause() {
+        if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
-        else
+            return true;
+        } else {
             mediaPlayer.start();
+            return false;
+        }
     }
 
     public void nextSong() {
@@ -105,14 +109,9 @@ public class SongsFragment extends androidx.fragment.app.Fragment {
     }
 
 
-    public String titleSong(){
-        return songViewHolder.song.getTitle();
-    }
-
-
-    public void shafieldNumber(){
+    public void shafieldNumber() {
         Random r = new Random();
-        int a = r.nextInt(0-songs.size());
+        int a = r.nextInt(0 - songs.size());
         songViewHolder.song = songs.get(a);
         try {
             songViewHolder.playSong();
@@ -122,6 +121,55 @@ public class SongsFragment extends androidx.fragment.app.Fragment {
 
     }
 
+
+    public void repeateAll() {
+        if (getSongPosition() == songs.size()) {
+            song = songs.get(0);
+            try {
+                songViewHolder.playSong();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else
+            nextSong();
+    }
+
+    public int getSongPosition() {
+        for (int i = 0; i < songs.size(); i++) {
+            if (song == songs.get(i))
+                return i;
+        }
+        return -1;
+    }
+
+
+    public String titleSong() {
+        return songViewHolder.song.getTitle();
+    }
+
+    public String takeDurationToMinute(int duration) {
+        String s = "";
+        int dur = duration;
+        int dph = dur / hourPerMS;
+
+        if (dph > 0) {
+            s += dph;
+            dur -= (dph * hourPerMS);
+        }
+        int dpm = dur / minPerMS;
+
+        if ((dpm) >= 0) {
+            if (dph > 0)
+                s += " : ";
+            s += dpm;
+            dur -= (dpm * minPerMS);
+        }
+        int dps = dur / secPerMS;
+        if (dps > 0) {
+            s += " : " + dps;
+        }
+        return s;
+    }
 
     public void updateUI() {
         songs = Repository.getInstance(getActivity()).getMusic(getActivity());
@@ -144,11 +192,10 @@ public class SongsFragment extends androidx.fragment.app.Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof CallBacks){
+        if (context instanceof CallBacks) {
             callBacks = (CallBacks) context;
-        callBacks.onClickListener();
-        }
-        else
+            callBacks.onClickListener();
+        } else
             throw new RuntimeException("Activity not impl CallBacks");
     }
 
@@ -161,6 +208,7 @@ public class SongsFragment extends androidx.fragment.app.Fragment {
 
     public interface CallBacks {
         void onClickListener();
+
         void getTitle(Song song);
     }
 
@@ -168,6 +216,7 @@ public class SongsFragment extends androidx.fragment.app.Fragment {
 
         private TextView songTextView;
         private TextView timeTextView;
+        private TextView artistTextView;
         private Song song;
 
 
@@ -175,19 +224,15 @@ public class SongsFragment extends androidx.fragment.app.Fragment {
             super(itemView);
             songTextView = itemView.findViewById(R.id.song_title);
             timeTextView = itemView.findViewById(R.id.song_time);
-            linearLayout = itemView.findViewById(R.id.buttons);
+            artistTextView = itemView.findViewById(R.id.song_artist);
 
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    try {
-                        playSong();
-                        callBacks.getTitle(song);
+                    playSong();
+                    callBacks.getTitle(song);
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
 
                 }
             });
@@ -196,22 +241,26 @@ public class SongsFragment extends androidx.fragment.app.Fragment {
         }
 
 
-        private void playSong() throws IOException {
+        private void playSong() {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.stop();
                 mediaPlayer.reset();
             }
 
-            mediaPlayer.setDataSource(getActivity(), song.uri);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-            linearLayout.setVisibility(View.VISIBLE);
+            try {
+                mediaPlayer.setDataSource(getActivity(), song.uri);
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         private void bind(Song song) {
             this.song = song;
             songTextView.setText(song.getTitle());
-            timeTextView.setText("" + song.getDuration());
+            timeTextView.setText(takeDurationToMinute(song.getDuration()));
+            artistTextView.setText(song.getArtistName());
 
 
         }
