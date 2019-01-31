@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AlbumFragment extends androidx.fragment.app.Fragment {
+public class AlbumFragment extends MediaPlayer {
 
 
     public AlbumFragment() {

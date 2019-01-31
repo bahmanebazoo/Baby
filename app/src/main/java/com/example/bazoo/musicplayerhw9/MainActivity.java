@@ -1,9 +1,14 @@
 package com.example.bazoo.musicplayerhw9;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.bazoo.musicplayerhw9.model.Song;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -17,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -24,10 +30,11 @@ import androidx.viewpager.widget.ViewPager;
 
 public class MainActivity extends AppCompatActivity implements SongsFragment.CallBacks {
 
-    TabItem tabItem;
     private ViewPager viewPager;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private AppCompatSeekBar compatSeekBar;
+    private ConstraintLayout constraintLayout;
+    private SongsFragment songsFragment = new SongsFragment();
     private Button nextBtn;
     private Button perBtn;
     private Button playBtn;
@@ -35,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
     private TabLayout tabLayout;
     private ViewPagerAdapter adapter;
     private int songDuration;
+    private Long song_ID;
 
 
     @Override
@@ -49,10 +57,12 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
         titleSong = findViewById(R.id.title_song);
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.fragment_container);
+        constraintLayout = findViewById(R.id.collapse_and_tabs_container);
         tabLayout.setupWithViewPager(viewPager, true);
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        SongsFragment songsFragment = SongsFragment.newInstance();
+
+        final SongsFragment songsFragment = SongsFragment.newInstance();
         adapter.addFrag(songsFragment, "Tracks");
 
         ArtistFragment artistFragment = ArtistFragment.newInstance();
@@ -63,55 +73,70 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
         viewPager.setAdapter(adapter);
 
 
-
-
-
-    }
-
-
-
-
-    @Override
-    public void onClickListener() {
-        final SongsFragment songsFragment = (SongsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean play = songsFragment.playOrPause();
-                if(play)
+
+                if (play)
                     playBtn.setText(R.string.play);
                 else
                     playBtn.setText(R.string.pause);
+
             }
-
-
         });
 
-        nextBtn.setOnClickListener(new View.OnClickListener() {
+        constraintLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                songsFragment.nextSong();
-                titleSong.setText(songsFragment.titleSong());
+                Toast.makeText(getApplicationContext(), "open detail", Toast.LENGTH_SHORT).show();
+                Intent intent = MusicDetailPlayer.newIntent(getApplicationContext(),song_ID);
+                startActivity(intent);
             }
+
+
         });
 
-        perBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                songsFragment.perSong();
-                titleSong.setText(songsFragment.titleSong());
-            }
-        });
 
+    }
+
+
+    @Override
+    public void onClickListener(Song song) {
+        playBtn.setText(R.string.pause);
+        int time = song.getDuration();
+        compatSeekBar.setMax(time);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            compatSeekBar.setMin(0);
+
+        Handler handler = new Handler();
+
+        for (int i = 0; i < songsFragment.currentPosition(); i++) {
+//            Log.d("delay", i+"");
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    compatSeekBar.setProgress(songsFragment.currentPosition());
+                    Log.d("delay", songsFragment.currentPosition() + "");
+                }
+            }, 1000);
+        }
 
     }
 
     @Override
-    public void getTitle(Song song) {
+    public void getSongDetails(Song song) {
         titleSong.setText(song.getTitle());
+        song_ID = song.getId();
         songDuration = song.getDuration() / 60000;
+
     }
 
+    public void hoandlerMethod() {
+
+
+    }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();

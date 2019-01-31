@@ -1,4 +1,4 @@
-package com.example.bazoo.musicplayerhw9;
+package com.example.bazoo.musicplayerhw9.model;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -6,10 +6,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import com.example.bazoo.musicplayerhw9.model.Album;
-import com.example.bazoo.musicplayerhw9.model.Artist;
-import com.example.bazoo.musicplayerhw9.model.Song;
 
 import java.util.ArrayList;
 import java.util.List;

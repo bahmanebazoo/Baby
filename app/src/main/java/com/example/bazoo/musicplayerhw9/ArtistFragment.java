@@ -1,7 +1,6 @@
 package com.example.bazoo.musicplayerhw9;
 
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +10,7 @@ import android.view.ViewGroup;
 /**
  * A simple {@link androidx.fragment.app.Fragment} subclass.
  */
-public class ArtistFragment extends androidx.fragment.app.Fragment {
+public class ArtistFragment extends MediaPlayer {
 
 
     public ArtistFragment() {
