@@ -1,12 +1,17 @@
 package com.example.bazoo.musicplayerhw9.model;
 
+import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,5 +128,29 @@ public class Repository {
         }
     }
 
+
+    public static Bitmap generateBitmap(Activity activity, Long albumId) {
+
+        Uri sArtworkUri = Uri
+                .parse("content://media/external/audio/albumart");
+        Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
+
+        Bitmap bitmap = null;
+        try {
+
+            bitmap = MediaStore.Images.Media.getBitmap(
+                    activity.getContentResolver(), albumArtUri);
+            /*if (bitmap != null)
+                bitmap = Bitmap.createScaledBitmap(bitmap, 80, 80, true);*/
+
+        } catch (FileNotFoundException exception) {
+            exception.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
 
 }

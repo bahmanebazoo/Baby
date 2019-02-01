@@ -13,6 +13,8 @@ public class Song {
     public final String albumName;
     public final long artistId;
     public final String artistName;
+    public boolean favorite;
+
 
     public Song() {
         this.id = -1;
@@ -37,6 +39,19 @@ public class Song {
         this.duration = _duration;
         this.trackNumber = _trackNumber;
         this.uri = uri;
+
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
+
+    public long getAlbumId() {
+        return albumId;
     }
 
     public String getAlbumName() {

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.bazoo.musicplayerhw9.model.Repository;
@@ -15,6 +16,8 @@ import com.example.bazoo.musicplayerhw9.model.Song;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -100,6 +103,7 @@ public class SongsFragment extends MediaPlayer {
         private TextView songTextView;
         private TextView timeTextView;
         private TextView artistTextView;
+        private AppCompatImageView appCompatImageView;
         private Song song;
 
 
@@ -108,6 +112,7 @@ public class SongsFragment extends MediaPlayer {
             songTextView = itemView.findViewById(R.id.song_title);
             timeTextView = itemView.findViewById(R.id.song_time);
             artistTextView = itemView.findViewById(R.id.song_artist);
+            appCompatImageView = itemView.findViewById(R.id.song_view_holder_image);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -129,6 +134,7 @@ public class SongsFragment extends MediaPlayer {
             songTextView.setText(song.getTitle());
             timeTextView.setText(takeDurationToMinute(song.getDuration()));
             artistTextView.setText(song.getArtistName());
+            appCompatImageView.setImageBitmap(Repository.getInstance(getActivity()).generateBitmap(getActivity(),song.getAlbumId()));
         }
     }
 
