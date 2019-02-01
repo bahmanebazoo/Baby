@@ -3,18 +3,23 @@ package com.example.bazoo.musicplayerhw9;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.example.bazoo.musicplayerhw9.model.Repository;
 import com.example.bazoo.musicplayerhw9.model.Song;
 import com.google.android.material.internal.CheckableImageButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatSeekBar;
 
 
@@ -32,7 +37,11 @@ public class MusicDetailPlayerFragment extends MediaPlayer {
     private AppCompatSeekBar seekbar;
     private TextView titleMusic;
     private TextView artist;
+    private AppCompatImageView backgroundImage;
+    private AppCompatImageView songImage;
+    private FrameLayout darkLayer;
     private Song song;
+    private Bitmap bitmap;
 
 
     public MusicDetailPlayerFragment() {
@@ -62,6 +71,14 @@ public class MusicDetailPlayerFragment extends MediaPlayer {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        bitmap = Repository.getInstance(getActivity())
+                .blur(getActivity(), Repository.getInstance(getActivity())
+                        .generateBitmap(getActivity(),song.albumId));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -74,9 +91,13 @@ public class MusicDetailPlayerFragment extends MediaPlayer {
         seekbar = musicView.findViewById(R.id.seekbar_music);
         titleMusic = musicView.findViewById(R.id.title_fragment_music);
         artist = musicView.findViewById(R.id.artist_music);
-
+        backgroundImage = musicView.findViewById(R.id.image_background_music);
+        songImage = musicView.findViewById(R.id.image_song_music);
         titleMusic.setText(song.getTitle());
         artist.setText(song.getArtistName());
+        backgroundImage.setImageBitmap(bitmap);
+        songImage.setImageBitmap(Repository.getInstance(getActivity())
+                .generateBitmap(getActivity(),song.albumId));
 
 
         return musicView;

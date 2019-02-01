@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.bazoo.musicplayerhw9.model.Repository;
@@ -16,8 +15,8 @@ import com.example.bazoo.musicplayerhw9.model.Song;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,7 +29,6 @@ public class SongsFragment extends MediaPlayer {
     private SongViewHolder songViewHolder;
     private RecyclerView recyclerView;
     private SongAdapter songAdapter;
-
 
 
     public SongsFragment() {
@@ -64,11 +62,17 @@ public class SongsFragment extends MediaPlayer {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        songs = Repository.getInstance(getActivity()).getMusic(getActivity());
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View songView = inflater.inflate(R.layout.fragment_songs, container, false);
-        songs = Repository.getInstance(getActivity()).getMusic(getActivity());
         recyclerView = songView.findViewById(R.id.song_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         songAdapter = new SongAdapter(songs);
@@ -97,7 +101,6 @@ public class SongsFragment extends MediaPlayer {
     }
 
 
-
     class SongViewHolder extends RecyclerView.ViewHolder {
 
         private TextView songTextView;
@@ -117,14 +120,14 @@ public class SongsFragment extends MediaPlayer {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    for (int i =0; i<songs.size();i++) {
+                    for (int i = 0; i < songs.size(); i++) {
                         if (songs.get(i).equals(song)) {
-                            Log.d("position number",i+"" );
+                            Log.d("position number", i + "");
                         }
                     }
-                    playSong(getActivity(),song);
+                    playSong(getActivity(), song);
                     callBacks.getSongDetails(song);
-                   callBacks.onClickListener(song);
+                    callBacks.onClickListener(song);
                 }
             });
         }
@@ -134,7 +137,8 @@ public class SongsFragment extends MediaPlayer {
             songTextView.setText(song.getTitle());
             timeTextView.setText(takeDurationToMinute(song.getDuration()));
             artistTextView.setText(song.getArtistName());
-            appCompatImageView.setImageBitmap(Repository.getInstance(getActivity()).generateBitmap(getActivity(),song.getAlbumId()));
+            appCompatImageView.setImageBitmap(Repository
+                    .getInstance(getActivity()).generateBitmap(getActivity(), song.getAlbumId()));
         }
     }
 
@@ -167,7 +171,7 @@ public class SongsFragment extends MediaPlayer {
 
         @Override
         public int getItemCount() {
-            Log.d("ssongs size: ",songs.size()+"");
+            Log.d("ssongs size: ", songs.size() + "");
             return songs.size();
         }
     }

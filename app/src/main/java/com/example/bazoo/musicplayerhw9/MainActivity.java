@@ -90,8 +90,9 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "open detail", Toast.LENGTH_SHORT).show();
+                if(song_ID!=null){
                 Intent intent = MusicDetailPlayer.newIntent(getApplicationContext(),song_ID);
-                startActivity(intent);
+                startActivity(intent);}
             }
 
 
