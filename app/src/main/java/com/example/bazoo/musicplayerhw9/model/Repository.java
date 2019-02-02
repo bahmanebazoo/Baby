@@ -14,8 +14,6 @@ import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +25,7 @@ public class Repository {
     private Album album;
     private List<Song> songList = new ArrayList<>();
     private List<Album> albumList = new ArrayList<>();
+    private List<Artist>artistList = new ArrayList<>();
 
     public Repository(Context context) {
         this.context = context;
@@ -171,6 +170,54 @@ public class Repository {
 
             Log.i("TAG", "getAlbum: " + albumList.size());
             return albumList;
+
+        } finally {
+            songCursor.close();
+        }
+    }
+
+    public List<Artist> getArtist(Context context) {
+
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri songUri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
+        String whereClause = MediaStore.Audio.Media.ARTIST;
+        Cursor songCursor = contentResolver.query(songUri,
+                null, null,
+                null, null);
+        try {
+
+            if (songCursor == null)
+                return artistList;
+
+            songCursor.moveToFirst();
+            do {
+                int artistID = songCursor.getColumnIndex(MediaStore.Audio.Artists._ID);
+                int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST);
+                int songCount = songCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS);
+                int albumCount = songCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_ALBUMS);
+
+                String currentArtist = songCursor.getString(songArtist);
+                Long currentArtistID = Long.parseLong(songCursor.getString(artistID));
+                int numberOfTracks = songCursor.getInt(songCount);
+                int numberOfAlbums = songCursor.getInt(albumCount);
+                artist = new Artist(currentArtistID,  currentArtist,numberOfTracks,numberOfAlbums);
+                Log.i("TAG", "getArtistName: " + artist.getName());
+
+                if (artistList.size() == 0)
+                    artistList.add(artist);
+                else {
+                    for (int i = 0; i < artistList.size(); i++) {
+                        if (!(artistList.get(i)).equals(artist)) {
+                            artistList.add(artist);
+                            Log.i("TAG", "getArtist: " + artistList.get(artistList.size() - 1));
+                            break;
+                        }
+                    }
+                }
+            } while (songCursor.moveToNext());
+
+            Log.i("TAG", "getAlbum: " + artistList.size());
+            return artistList;
 
         } finally {
             songCursor.close();

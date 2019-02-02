@@ -20,4 +20,16 @@ public class Artist {
         this.songCount = _songCount;
         this.albumCount = _albumCount;
     }
+
+    public int getAlbumCount() {
+        return albumCount;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getSongCount() {
+        return songCount;
+    }
 }

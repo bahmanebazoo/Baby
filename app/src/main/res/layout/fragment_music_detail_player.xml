@@ -1,71 +1,77 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
     tools:context="com.example.bazoo.musicplayerhw9.MusicDetailPlayerFragment">
 
-<androidx.appcompat.widget.AppCompatImageView
-    android:id="@+id/image_background_music"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scaleType="fitXY"
-    android:tint="@color/layer"/>
-
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/image_background_music"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:tint="@color/layer" />
 
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/image_song_music"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_margin="100dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"
+        android:layout_margin="100dp" />
 
 
     <LinearLayout
         android:id="@+id/buttonPanel_music"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_below="@+id/image_song_music"
         android:gravity="center"
-        android:orientation="horizontal"
-      >
+        android:orientation="horizontal">
 
 
         <com.google.android.material.internal.CheckableImageButton
             android:id="@+id/shufeild_music"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:layout_margin="8dp"/>
+            android:layout_width="50dp"
+            android:src="@drawable/shuf_image_icon"
+            android:layout_height="50dp"
+            android:layout_margin="8dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/per_music"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:layout_margin="8dp"/>
+            app:icon="@drawable/pre_image_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp" />
 
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/play_music"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:layout_margin="8dp"/>
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:icon="@drawable/play_image_icon"
+            android:background="@drawable/round_button"
+            app:iconGravity="textStart"
+            app:strokeWidth="3dp"
+            app:strokeColor="@android:color/holo_red_dark" />
 
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/next_music"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:layout_margin="8dp"/>
+            app:icon="@drawable/next_image_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp" />
 
 
         <com.google.android.material.internal.CheckableImageButton
             android:id="@+id/repeat_music"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:layout_margin="8dp"/>
+            android:src="@drawable/repeat_one_image_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="8dp" />
 
 
     </LinearLayout>
@@ -73,27 +79,32 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonPanel_music"
         android:gravity="center"
-        android:orientation="vertical"
-        android:layout_below="@+id/buttonPanel_music">
+        android:background="@color/layer"
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/seekbar_music"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_margin="8dp"/>
+            android:layout_margin="8dp" />
 
         <TextView
             android:id="@+id/title_fragment_music"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"/>
+            android:textAllCaps="true"
+            android:layout_marginLeft="100dp"
+            android:layout_margin="8dp" />
 
         <TextView
             android:id="@+id/artist_music"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="8dp"/>
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:layout_marginLeft="100dp"
+            android:layout_margin="8dp" />
 
     </LinearLayout>
 
