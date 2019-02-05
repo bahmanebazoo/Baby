@@ -13,7 +13,6 @@ import com.example.bazoo.musicplayerhw9.Utils.Kind;
 import com.example.bazoo.musicplayerhw9.model.Repository;
 import com.example.bazoo.musicplayerhw9.model.Song;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -186,6 +185,7 @@ public class SongsFragment extends MediaPlayer {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    getCurrentSong(song);
                     for (int i = 0; i < songs.size(); i++) {
                         if (songs.get(i).equals(song)) {
                             Log.d("position number", i + "");

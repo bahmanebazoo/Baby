@@ -17,12 +17,14 @@ public class MediaPlayer extends Fragment {
     public static final int minPerMS = 60000;
     public static final int secPerMS = 1000;
     public static final String KIND_OF_LIST = "kind of list";
-    public static Song song = new Song();
     public static SongCallBacks songCallBacks;
     public static List<Song> songs = new ArrayList<>();
     public static List<Song> shufSong = new ArrayList<>();
     public static android.media.MediaPlayer mediaPlayer = new android.media.MediaPlayer();
-
+    public static boolean shuflle = false;
+    public static boolean reapeat = false;
+    public static boolean reapeatAll = false;
+    public Song song;
 
     public static void playSong(Context context, Song song) {
 
@@ -60,35 +62,33 @@ public class MediaPlayer extends Fragment {
     }
 
     public Song nextSong(Context context, Song song) {
-        for (int i = 0; i < songs.size(); i++) {
-            if (songs.get(i).equals(song)) {
-                try {
-                    song = songs.get(i + 1);
-                    playSong(context, song);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
+
+
+        int i = getSongPosition();
+        if (shuflle)
+            this.song = shufSong.get(i + 1);
+        else
+            this.song = songs.get(i + 1);
+        try {
+            playSong(context, this.song);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return song;
+        return this.song;
     }
 
 
     public Song perSong(Context context, Song song) {
 
-        for (int i = 0; i < songs.size(); i++) {
-            if (songs.get(i).equals(song)) {
-                try {
-                    song = songs.get(i - 1);
-                    playSong(context, song);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
+        int i = getSongPosition();
+        try {
+            this.song = songs.get(i - 1);
+            playSong(context, this.song);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return song;
+
+        return this.song;
     }
 
 
@@ -106,15 +106,20 @@ public class MediaPlayer extends Fragment {
 
 
     public void repeateAll(Context context, Song song) {
-        if (getSongPosition() == songs.size()-1) {
-            song = songs.get(0);
+        if(reapeat&&reapeatAll){
+        if (getSongPosition() == songs.size() - 1) {
+            this.song = songs.get(0);
             try {
-                playSong(context, song);
+                playSong(context, this.song);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else
-            nextSong(context, song);
+            nextSong(context, songs.get(getSongPosition() + 1));}
+            if(reapeat){
+
+
+            }
     }
 
     public int getSongPosition() {
@@ -160,12 +165,15 @@ public class MediaPlayer extends Fragment {
 
     }
 
+    public void getCurrentSong(Song song) {
+        this.song = song;
+    }
+
 
     public interface SongCallBacks {
         void onClickListener(Song song);
 
         void getSongDetails(Song song);
     }
-
 
 }
