@@ -32,4 +32,8 @@ public class Artist {
     public int getSongCount() {
         return songCount;
     }
+
+    public long getId() {
+        return id;
+    }
 }

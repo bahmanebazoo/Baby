@@ -9,9 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.bazoo.musicplayerhw9.Utils.Kind;
 import com.example.bazoo.musicplayerhw9.model.Repository;
 import com.example.bazoo.musicplayerhw9.model.Song;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -26,19 +28,66 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class SongsFragment extends MediaPlayer {
 
-    private SongViewHolder songViewHolder;
+    public static final String ALBUM_ID = "album";
+    public static final String TITLE_FILTER = "filter";
+    public static final String IS_FAVORITE = "favorite";
+    public static final String PLAYLIST_ID = "playlist id";
+    public SongViewHolder songViewHolder;
     private RecyclerView recyclerView;
     private SongAdapter songAdapter;
-
+    private Song song=new Song();
+//    private List<Song> songs = new ArrayList<>();
 
     public SongsFragment() {
         // Required empty public constructor
     }
 
-    public static SongsFragment newInstance() {
+
+    public static SongsFragment newInstance(String kind) {
 
         Bundle args = new Bundle();
+        args.putString(KIND_OF_LIST, kind);
+        SongsFragment fragment = new SongsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
+
+    public static SongsFragment newInstance(String kind, Long albumID) {
+
+        Bundle args = new Bundle();
+        args.putLong(ALBUM_ID, albumID);
+        args.putString(KIND_OF_LIST, kind);
+        SongsFragment fragment = new SongsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static SongsFragment newInstance(String kind, String s) {
+
+        Bundle args = new Bundle();
+        args.putString(TITLE_FILTER, s);
+        args.putString(KIND_OF_LIST, kind);
+        SongsFragment fragment = new SongsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static SongsFragment newInstance(String kind, boolean b) {
+
+        Bundle args = new Bundle();
+        args.putBoolean(IS_FAVORITE, b);
+        args.putString(KIND_OF_LIST, kind);
+        SongsFragment fragment = new SongsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static SongsFragment newInstance(String kind, int playListID) {
+
+        Bundle args = new Bundle();
+        args.putInt(PLAYLIST_ID, playListID);
+        args.putString(KIND_OF_LIST, kind);
         SongsFragment fragment = new SongsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -48,23 +97,23 @@ public class SongsFragment extends MediaPlayer {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof CallBacks) {
-            callBacks = (CallBacks) context;
-            callBacks.onClickListener(song);
+        if (context instanceof SongCallBacks) {
+            songCallBacks = (SongCallBacks) context;
+            songCallBacks.onClickListener(song);
         } else
-            throw new RuntimeException("Activity not impl CallBacks");
+            throw new RuntimeException("Activity not impl SongCallBacks");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        callBacks = null;
+        songCallBacks = null;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        songs = Repository.getInstance(getActivity()).getMusic(getActivity());
+        getSongList();
 
     }
 
@@ -83,7 +132,7 @@ public class SongsFragment extends MediaPlayer {
 
 
     public void updateUI() {
-        super.songs = Repository.getInstance(getActivity()).getMusic(getActivity());
+        super.songs = getSongList();
 
         if (songAdapter == null) {
             songAdapter = new SongAdapter(songs);
@@ -100,6 +149,23 @@ public class SongsFragment extends MediaPlayer {
         updateUI();
     }
 
+    public List<Song> getSongList() {
+        String kind = getArguments().getString(KIND_OF_LIST);
+        if (kind == Kind.MAIN.toString())
+            songs = Repository.getInstance(getActivity()).getAllMusic();
+        else if (kind == Kind.ALBUM.toString())
+            songs = Repository.getInstance(getActivity()).getSpecificSongs(getArguments().getLong(ALBUM_ID));
+        else if (kind == Kind.FAVORITE.toString())
+            songs = Repository.getInstance(getActivity()).getAllMusic();
+        else if (kind == Kind.SEARCH.toString())
+            songs = Repository.getInstance(getActivity()).getFilteredSongs(getArguments().getString(TITLE_FILTER));
+        else if (kind == Kind.PLAYLIST.toString())
+            songs = Repository.getInstance(getActivity()).getAllMusic();
+        else
+            songs = null;
+
+            return songs;
+    }
 
     class SongViewHolder extends RecyclerView.ViewHolder {
 
@@ -107,7 +173,7 @@ public class SongsFragment extends MediaPlayer {
         private TextView timeTextView;
         private TextView artistTextView;
         private AppCompatImageView appCompatImageView;
-        private Song song;
+        public Song song;
 
 
         public SongViewHolder(@NonNull View itemView) {
@@ -126,8 +192,8 @@ public class SongsFragment extends MediaPlayer {
                         }
                     }
                     playSong(getActivity(), song);
-                    callBacks.getSongDetails(song);
-                    callBacks.onClickListener(song);
+                    songCallBacks.getSongDetails(song);
+                    songCallBacks.onClickListener(song);
                 }
             });
         }
@@ -144,11 +210,11 @@ public class SongsFragment extends MediaPlayer {
 
     class SongAdapter extends RecyclerView.Adapter<SongViewHolder> {
 
-        public SongAdapter(List<Song> songs1) {
+        private SongAdapter(List<Song> songs1) {
             songs = songs1;
         }
 
-        public void setList(List<Song> songs1) {
+        private void setList(List<Song> songs1) {
             songs = songs1;
         }
 
@@ -171,7 +237,7 @@ public class SongsFragment extends MediaPlayer {
 
         @Override
         public int getItemCount() {
-            Log.d("ssongs size: ", songs.size() + "");
+            Log.d("songs size: ", songs.size() + "");
             return songs.size();
         }
     }

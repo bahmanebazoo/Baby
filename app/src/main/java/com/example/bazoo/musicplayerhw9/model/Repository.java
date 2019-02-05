@@ -14,8 +14,13 @@ import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 
+import com.example.bazoo.musicplayerhw9.MediaPlayer;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import androidx.annotation.Nullable;
 
 public class Repository {
     private static Repository instance;
@@ -84,7 +89,7 @@ public class Repository {
 
 
 
-    public List<Song> getMusic(Context context) {
+    public List<Song> getAllMusic() {
 
         ContentResolver contentResolver = context.getContentResolver();
         Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -120,7 +125,7 @@ public class Repository {
                 Uri currentUri = Uri.parse(songCursor.getString(srcUri));
                 song = new Song(currentTitleID, currentAlbumID, currentArtistID, currentTitle, currentArtist, currentAlbum, currentDuration, currentTrackNumber, currentUri);
                 songList.add(song);
-                Log.i("TAG", "getMusic: " + songList.size());
+                Log.i("TAG", "getAllMusic: " + songList.size());
             } while (songCursor.moveToNext());
 
             return songList;
@@ -129,8 +134,8 @@ public class Repository {
         }
     }
 
-    public List<Album> getAlbum(Context context) {
-
+    public List<Album> getAllAlbum() {
+List<Song> songs = getAllMusic();
         ContentResolver contentResolver = context.getContentResolver();
         Uri songUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
         String whereClause = MediaStore.Audio.Media.ALBUM;
@@ -154,21 +159,29 @@ public class Repository {
                 String currentArtist = songCursor.getString(songArtist);
                 Long currentAlbumID = Long.parseLong(songCursor.getString(albumID));
                 String currentAlbum = songCursor.getString(songAlbum);
-                album = new Album(currentAlbumID, currentAlbum, currentArtist);
+                Random r = new Random();
+                Long currentArtistID=r.nextLong();
+                for(int i=0;i<songs.size();i++){
+                    if(songs.get(i).getAlbumName()==currentAlbum) {
+                         currentArtistID = songs.get(i).getArtistId();
+                        break;
+                    }
+                }
+                album = new Album(currentAlbumID, currentAlbum, currentArtist,currentArtistID );
                 if (albumList.size() == 0)
                     albumList.add(album);
                 else{
                     for (int i = 0; i < albumList.size() ; i++) {
                         if (!(albumList.get(i)).equals(album)) {
                             albumList.add(album);
-                            Log.i("TAG", "getAlbum: " + albumList.get(albumList.size() - 1));
+                            Log.i("TAG", "getAllAlbum: " + albumList.get(albumList.size() - 1));
                             break;
                         }
                     }
                 }
             } while (songCursor.moveToNext());
 
-            Log.i("TAG", "getAlbum: " + albumList.size());
+            Log.i("TAG", "getAllAlbum: " + albumList.size());
             return albumList;
 
         } finally {
@@ -216,12 +229,73 @@ public class Repository {
                 }
             } while (songCursor.moveToNext());
 
-            Log.i("TAG", "getAlbum: " + artistList.size());
+            Log.i("TAG", "getAllAlbum: " + artistList.size());
             return artistList;
 
         } finally {
             songCursor.close();
         }
     }
+
+
+
+    public List<Song> getSpecificSongs(Long id){
+        List<Song> songs = new ArrayList<>();
+        getAllMusic();
+
+        for(int i=0;i<songList.size();i++) {
+            if (songList.get(i).getAlbumId() == id) {
+                songs.add(songList.get(i));
+            }
+        }
+        return songs;
+    }
+
+    public List<Song> getFilteredSongs(String s){
+        List<Song> songs = new ArrayList<>();
+        getAllMusic();
+
+        for(int i=0;i<songList.size();i++) {
+            if (songList.get(i).getTitle().contains(s)) {
+                songs.add(songList.get(i));
+            }
+        }
+        return songs;
+    }
+
+    public List<Album> getFilteredAlbum(String s){
+        List<Album> albums = new ArrayList<>();
+        getAllAlbum();
+        for(int i=0;i<albumList.size();i++){
+            if(albumList.get(i).getTitle().contains(s)){
+                albums.add(albumList.get(i));
+            }
+        }
+        return albums;
+    }
+
+    public List<Album> getSpecificAlbum(Long id){
+        List<Album> albums = new ArrayList<>();
+        getAllAlbum();
+
+        for(int i=0;i<albumList.size();i++){
+            if(albumList.get(i).getArtist_ID()==id){
+                albums.add(albumList.get(i));
+            }
+        }
+        return albums;
+    }
+
+
+/*    public Song getSongByID(Long id){
+        List<Song> songs1;
+    songs1 = MediaPlayer.songs;
+        for(int i;i<songs1.size();i++){
+        if(songs1.get(i).getId()==id)
+            return songs1.get(i);
+    }
+        return null;
+}*/
+
 
 }

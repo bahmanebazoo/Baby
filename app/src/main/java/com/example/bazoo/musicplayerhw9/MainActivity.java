@@ -10,9 +10,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.bazoo.musicplayerhw9.Utils.Kind;
+import com.example.bazoo.musicplayerhw9.model.Album;
+import com.example.bazoo.musicplayerhw9.model.Artist;
 import com.example.bazoo.musicplayerhw9.model.Song;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-public class MainActivity extends AppCompatActivity implements SongsFragment.CallBacks {
+public class MainActivity extends AppCompatActivity implements MediaPlayer.SongCallBacks {
 
     private ViewPager viewPager;
     private CollapsingToolbarLayout collapsingToolbarLayout;
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
     private TabLayout tabLayout;
     private ViewPagerAdapter adapter;
     private int songDuration;
-    private Long song_ID;
+    private Long id;
 
 
     @Override
@@ -62,13 +64,13 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
 
-        final SongsFragment songsFragment = SongsFragment.newInstance();
+      songsFragment = SongsFragment.newInstance(Kind.MAIN.toString());
         adapter.addFrag(songsFragment, "Tracks");
 
-        ArtistFragment artistFragment = ArtistFragment.newInstance();
+        ArtistFragment artistFragment = ArtistFragment.newInstance(Kind.MAIN.toString());
         adapter.addFrag(artistFragment, "Artists");
 
-        AlbumFragment albumFragment = AlbumFragment.newInstance();
+        AlbumFragment albumFragment = AlbumFragment.newInstance(Kind.MAIN.toString());
         adapter.addFrag(albumFragment, "Albums");
         viewPager.setAdapter(adapter);
 
@@ -86,13 +88,32 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
             }
         });
 
+        perBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(),"bahmanper",Toast.LENGTH_SHORT).show();
+                songsFragment.songViewHolder.song =
+                        songsFragment.perSong(getApplicationContext(),songsFragment.songViewHolder.song);
+
+            }
+        });
+
+        nextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                songsFragment.songViewHolder.song =
+                        songsFragment.nextSong(getApplicationContext(),songsFragment.songViewHolder.song);
+            }
+        });
+
         constraintLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "open detail", Toast.LENGTH_SHORT).show();
-                if(song_ID!=null){
-                Intent intent = MusicDetailPlayer.newIntent(getApplicationContext(),song_ID);
-                startActivity(intent);}
+                if (id != null) {
+                    Intent intent = MusicDetailPlayer.newIntent(getApplicationContext(), id, Kind.MAIN.toString());
+                    startActivity(intent);
+                }
             }
 
 
@@ -113,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
         Handler handler = new Handler();
 
         for (int i = 0; i < songsFragment.currentPosition(); i++) {
-//            Log.d("delay", i+"");
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -129,54 +149,51 @@ public class MainActivity extends AppCompatActivity implements SongsFragment.Cal
     @Override
     public void getSongDetails(Song song) {
         titleSong.setText(song.getTitle());
-        song_ID = song.getId();
+        id = song.getId();
+
         songDuration = song.getDuration() / 60000;
 
     }
 
-    public void hoandlerMethod() {
 
 
+
+
+
+
+
+class ViewPagerAdapter extends FragmentStatePagerAdapter {
+    private final List<Fragment> mFragmentList = new ArrayList<>();
+    private final List<String> mFragmentTitleList = new ArrayList<>();
+
+    public ViewPagerAdapter(@NonNull FragmentManager fm) {
+        super(fm);
     }
 
-    class ViewPagerAdapter extends FragmentStatePagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public ViewPagerAdapter(@NonNull FragmentManager fm) {
-            super(fm);
-        }
-
-        /**
-         * Return the Fragment associated with a specified position.
-         *
-         * @param position
-         */
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
-
-        /**
-         * Return the number of views available.
-         */
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFrag(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-
-        }
+    @NonNull
+    @Override
+    public Fragment getItem(int position) {
+        return mFragmentList.get(position);
     }
+
+
+    @Override
+    public int getCount() {
+        return mFragmentList.size();
+    }
+
+    public void addFrag(Fragment fragment, String title) {
+        mFragmentList.add(fragment);
+        mFragmentTitleList.add(title);
+    }
+
+    @Nullable
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return mFragmentTitleList.get(position);
+
+    }
+}
 
 }

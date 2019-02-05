@@ -39,7 +39,6 @@ public class MusicDetailPlayerFragment extends MediaPlayer {
     private TextView artist;
     private AppCompatImageView backgroundImage;
     private AppCompatImageView songImage;
-    private FrameLayout darkLayer;
     private Song song;
     private Bitmap bitmap;
 
@@ -65,9 +64,15 @@ public class MusicDetailPlayerFragment extends MediaPlayer {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
-        song=null;
+
     }
 
     @Override
@@ -100,6 +105,13 @@ public class MusicDetailPlayerFragment extends MediaPlayer {
                 .generateBitmap(getActivity(),song.albumId));
 
 
+        per.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                perSong(getActivity(),song);
+            }
+        });
+
         return musicView;
     }
 
@@ -112,6 +124,10 @@ public class MusicDetailPlayerFragment extends MediaPlayer {
                 song = songs.get(i);
             }
         }
+    }
+
+    public void updateUI(){
+
     }
 
 }

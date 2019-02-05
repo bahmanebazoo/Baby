@@ -78,4 +78,7 @@ public class Song {
         return trackNumber;
     }
 
+    public long getArtistId() {
+        return artistId;
+    }
 }

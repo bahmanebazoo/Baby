@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 public class MediaPlayer extends Fragment {
@@ -17,14 +16,16 @@ public class MediaPlayer extends Fragment {
     public static final int hourPerMS = 3600000;
     public static final int minPerMS = 60000;
     public static final int secPerMS = 1000;
+    public static final String KIND_OF_LIST = "kind of list";
     public static Song song = new Song();
-    public static CallBacks callBacks;
+    public static SongCallBacks songCallBacks;
     public static List<Song> songs = new ArrayList<>();
-
+    public static List<Song> shufSong = new ArrayList<>();
     public static android.media.MediaPlayer mediaPlayer = new android.media.MediaPlayer();
 
 
     public static void playSong(Context context, Song song) {
+
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.reset();
@@ -34,18 +35,18 @@ public class MediaPlayer extends Fragment {
             mediaPlayer.setDataSource(context, song.uri);
             mediaPlayer.prepare();
             mediaPlayer.start();
+            songCallBacks.getSongDetails(song);
         } catch (Exception e) {
             e.printStackTrace();
         }
         Log.d("song Title", song.getTitle() + "");
         Log.d("song Title", "bahman:  " + song.getTitle() + "");
+
     }
 
     public static android.media.MediaPlayer getMediaPlayer() {
         return mediaPlayer;
     }
-
-
 
 
     public boolean playOrPause() {
@@ -58,12 +59,11 @@ public class MediaPlayer extends Fragment {
         }
     }
 
-    public void nextSong(Context context, Song song) {
-        Song my_song = song;
+    public Song nextSong(Context context, Song song) {
         for (int i = 0; i < songs.size(); i++) {
-            if (songs.get(i).equals(my_song)) {
-                song = songs.get(i + 1);
+            if (songs.get(i).equals(song)) {
                 try {
+                    song = songs.get(i + 1);
                     playSong(context, song);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -71,22 +71,24 @@ public class MediaPlayer extends Fragment {
                 break;
             }
         }
+        return song;
     }
 
 
-    public void perSong(Context context, Song song) {
-        Song my_song = song;
+    public Song perSong(Context context, Song song) {
+
         for (int i = 0; i < songs.size(); i++) {
-            if (songs.get(i).equals(my_song)) {
-                my_song = songs.get(i - 1);
+            if (songs.get(i).equals(song)) {
                 try {
-                    playSong(context, my_song);
+                    song = songs.get(i - 1);
+                    playSong(context, song);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
             }
         }
+        return song;
     }
 
 
@@ -104,7 +106,7 @@ public class MediaPlayer extends Fragment {
 
 
     public void repeateAll(Context context, Song song) {
-        if (getSongPosition() == songs.size()) {
+        if (getSongPosition() == songs.size()-1) {
             song = songs.get(0);
             try {
                 playSong(context, song);
@@ -153,14 +155,15 @@ public class MediaPlayer extends Fragment {
     }
 
 
-    public int currentPosition(){
+    public int currentPosition() {
         return mediaPlayer.getCurrentPosition();
 
     }
 
 
-    public interface CallBacks {
+    public interface SongCallBacks {
         void onClickListener(Song song);
+
         void getSongDetails(Song song);
     }
 

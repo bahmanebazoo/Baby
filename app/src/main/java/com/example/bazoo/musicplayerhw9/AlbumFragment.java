@@ -2,11 +2,13 @@ package com.example.bazoo.musicplayerhw9;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.bazoo.musicplayerhw9.Utils.Kind;
 import com.example.bazoo.musicplayerhw9.model.Album;
 import com.example.bazoo.musicplayerhw9.model.Repository;
 
@@ -17,35 +19,71 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
 public class AlbumFragment extends MediaPlayer {
 
+    public static final String Album_NAME = "artist name";
+    public static final String ARTIST_ID = "artist";
+    public static final String TITLE_FILTER = "filter";
+    public static final String IS_FAVORITE = "favorite";
     private AlbumViewHolder albumViewHolder;
     private RecyclerView recyclerView;
     private AlbumAdapter albumAdapter;
-
+    private Album album = new Album();
     private List<Album> albums = new ArrayList<>();
+
 
     public AlbumFragment() {
         // Required empty public constructor
     }
 
-    public static AlbumFragment newInstance() {
+    public static AlbumFragment newInstance(String kind) {
 
         Bundle args = new Bundle();
-
+        args.putString(KIND_OF_LIST, kind);
         AlbumFragment fragment = new AlbumFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
+
+    public static AlbumFragment newInstance(String kind, Long artistID) {
+
+        Bundle args = new Bundle();
+        args.putLong(ARTIST_ID, artistID);
+        args.putString(KIND_OF_LIST, kind);
+        AlbumFragment fragment = new AlbumFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static AlbumFragment newInstance(String kind, String s) {
+
+        Bundle args = new Bundle();
+        args.putString(TITLE_FILTER, s);
+        args.putString(KIND_OF_LIST, kind);
+        AlbumFragment fragment = new AlbumFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static AlbumFragment newInstance(String kind, boolean b) {
+
+        Bundle args = new Bundle();
+        args.putBoolean(IS_FAVORITE, b);
+        args.putString(KIND_OF_LIST, kind);
+        AlbumFragment fragment = new AlbumFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        albums = Repository.getInstance(getActivity()).getAlbum(getActivity());
+        albums = getAlbumList();
     }
 
     @Override
@@ -60,7 +98,7 @@ public class AlbumFragment extends MediaPlayer {
 
         View albumView = inflater.inflate(R.layout.fragment_album, container, false);
         recyclerView = albumView.findViewById(R.id.album_recyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         albumAdapter = new AlbumAdapter(albums);
         recyclerView.setAdapter(albumAdapter);
 
@@ -69,7 +107,7 @@ public class AlbumFragment extends MediaPlayer {
     }
 
     public void updateUI() {
-        albums = Repository.getInstance(getActivity()).getAlbum(getActivity());
+        albums = getAlbumList();
 
         if (albumAdapter == null) {
             albumAdapter = new AlbumAdapter(albums);
@@ -81,6 +119,25 @@ public class AlbumFragment extends MediaPlayer {
     }
 
 
+    public List<Album> getAlbumList() {
+        String kind = getArguments().getString(KIND_OF_LIST);
+        if (kind.equals(Kind.MAIN.toString()))
+            albums = Repository.getInstance(getActivity()).getAllAlbum();
+        else if (kind.equals(Kind.ARTIST.toString()))
+            albums = Repository.getInstance(getActivity()).getSpecificAlbum(getArguments().getLong(ARTIST_ID));
+        else if (kind.equals(Kind.FAVORITE.toString()))
+            albums = Repository.getInstance(getActivity()).getAllAlbum();
+        else if (kind.equals(Kind.SEARCH.toString()))
+            albums = Repository.getInstance(getActivity()).getFilteredAlbum(getArguments().getString(TITLE_FILTER));
+        else if (kind.equals(Kind.PLAYLIST.toString()))
+            albums = Repository.getInstance(getActivity()).getAllAlbum();
+
+
+
+        return albums;
+    }
+
+
     class AlbumViewHolder extends RecyclerView.ViewHolder {
 
         private TextView albumTextView;
@@ -88,7 +145,7 @@ public class AlbumFragment extends MediaPlayer {
         private TextView albumYear;
         private TextView artistName;
         private AppCompatImageView albumImage;
-        private Album album;
+
 
         public AlbumViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -101,7 +158,6 @@ public class AlbumFragment extends MediaPlayer {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                 }
             });
         }
@@ -110,7 +166,7 @@ public class AlbumFragment extends MediaPlayer {
             String count = "songs count: ";
             String year = "published: ";
             album = album1;
-            albumTextView.setText(album1.getTitle()+"( " + album1.getArtistName() + " )");
+            albumTextView.setText(album1.getTitle() + "( " + album1.getArtistName() + " )");
 //            songsCount.setText(count + album1.getSongCount());
             albumImage.setImageBitmap(Repository.getInstance
                     (getActivity()).generateBitmap(getActivity(), album1.getId()));
